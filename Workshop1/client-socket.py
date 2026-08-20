@@ -1,3 +1,5 @@
+# Client socket in Python
+
 from socket import *
 
 serverName = input("Enter server hostname or IP address: ")
