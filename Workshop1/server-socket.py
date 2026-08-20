@@ -43,4 +43,3 @@ while True:
         connectionSocket.close()
     except Exception as e:
         print("Error closing connection:", e)
-   clientSocket.close()
