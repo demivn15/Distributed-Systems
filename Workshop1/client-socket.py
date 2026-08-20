@@ -1,7 +1,9 @@
 # Client socket in Python
 
 import logging
+import random
 from socket import *
+import string
 import threading
 
 logging.basicConfig(
@@ -25,14 +27,21 @@ def serverIdentification(clientID:int) -> tuple:
     if not serverPort:
         serverPort = DEFAULT_PORT_NUMBER
         logging.info(f"No port number specified. Using default port number: {DEFAULT_PORT_NUMBER}")
+    try:
+        serverPort:int = int(serverPort)
+    except:
+        serverPort = DEFAULT_PORT_NUMBER
+        logging.info(f"Invalid port number. Using default port number: {DEFAULT_PORT_NUMBER}")
     if serverPort <= MIN_PORT_NUMBER or serverPort > MAX_PORT_NUMBER:
         serverPort = DEFAULT_PORT_NUMBER
     logging.info(f"Client {clientID} trying to connect to the server...")
     return (serverName, serverPort)
 
 def clientInitialization(clientID:int, serverName:str, serverPort:int) -> None:
-    next:bool = True
-    while next:
+    numberOfMessages = random.randint(1, 3)
+    for message in range(numberOfMessages):
+        randomText = "".join(random.choices(string.ascii_lowercase, k = 8))
+        sentence:str = f"Client {clientID}, message {message + 1}: {randomText}"
         clientSocket:socket.socket = socket(AF_INET, SOCK_STREAM)
         try:
             clientSocket.connect((serverName, serverPort))
@@ -44,7 +53,6 @@ def clientInitialization(clientID:int, serverName:str, serverPort:int) -> None:
             else:
                 continue
         logging.info(f"Client {clientID} successfully connected to the server.")
-        sentence:str = input(f"Enter a lowercase sentence for client {clientID}:")
         clientSocket.send(sentence.encode())
         modifiedSentence:str = clientSocket.recv(BYTES_DATA_CHUNK)
         print("Message from server:", modifiedSentence.decode())
