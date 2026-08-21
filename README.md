@@ -19,3 +19,13 @@ Both the Python and C implementations work with multithreading. This configurati
 ### Results
 
 Results show proper communication between parties regardless of the language used for coding. 
+
+### Known problems
+
+It is important to notice that, in order to properly connect both systems, Windows had to be configured at the firewall level to allow inbound TCP traffic from port 12000.
+
+---
+
+> For more details check the full report.
+
+---
