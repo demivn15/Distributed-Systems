@@ -1,3 +1,5 @@
+# Client in Python
+
 import logging
 import random
 from socket import *
@@ -16,7 +18,6 @@ MIN_PORT_NUMBER:int = 0
 MAX_PORT_NUMBER:int = 65535
 BYTES_DATA_CHUNK:int = 1024
 
-# 1. Quitamos el clientID como parámetro porque solo pediremos esto una vez
 def serverIdentification() -> tuple:
     serverName:str = input("Enter server hostname or IP address: ")
     if not serverName:
@@ -41,21 +42,16 @@ def clientInitialization(clientID:int, serverName:str, serverPort:int) -> None:
     for message in range(numberOfMessages):
         randomText = "".join(random.choices(string.ascii_lowercase, k = 8))
         sentence:str = f"Client {clientID}, message {message + 1}: {randomText}"
-        
-        # 2. Corregido el type hint de socket.socket a simplemente socket
         clientSocket:socket = socket(AF_INET, SOCK_STREAM)
         try:
             clientSocket.connect((serverName, serverPort))
         except Exception as exception:
             logging.error(f"Client {clientID} failed: {exception}")
-            break # Rompemos el ciclo si falla la conexión
-            
+            break # Break the loop if connection fails.
         logging.info(f"Client {clientID} successfully connected to the server.")
         clientSocket.send(sentence.encode())
         modifiedSentence:bytes = clientSocket.recv(BYTES_DATA_CHUNK)
         print(f"[Client {clientID}] Message from server:", modifiedSentence.decode())
-        
-        # 3. Eliminamos el input() que preguntaba "Other message (Y/N)" para que sea automático
         clientSocket.close()
 
 def main() -> None:
@@ -65,20 +61,15 @@ def main() -> None:
         logging.info(f"No number of clients specified. Using {DEFAULT_NUMBER_OF_CLIENTS} clients.")
     else:
         numberOfClients_int = int(numberOfClients)
-        
-    # 4. Movimos la petición de IP AFUERA del bucle
     serverName, serverPort = serverIdentification()
     
     threads:list = []
     for _id in range(numberOfClients_int):
-        # 5. Ahora todos los hilos reciben la misma IP de golpe y pueden arrancar en paralelo
         thread:threading.Thread = threading.Thread(target = clientInitialization, args = (_id + 1, serverName, serverPort))
         threads.append(thread)
         thread.start()
-        
     for thread in threads:
         thread.join()
-        
     logging.info("All clients have finished.")
 
 if __name__ == "__main__":
