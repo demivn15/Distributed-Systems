@@ -1,87 +1,122 @@
-// Client socket in C
-
+// Client socket in C (Multithreaded & Automated)
 #include <errno.h>
 #include <netdb.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <pthread.h>
+#include <time.h>
+#include <arpa/inet.h>
 
-#define PORT 4242  // server port to connect to
+#define PORT 12000
+#define NUM_CLIENTS 3
 
-int main(int ac, char **av) {
-    printf("---- CLIENT ----\n\n");
+char server_ip[64];
+
+// Estructura para pasar datos al hilo
+typedef struct
+{
+    int client_id;
+} thread_data_t;
+
+void *client_thread(void *arg)
+{
+    thread_data_t *data = (thread_data_t *)arg;
+    int client_id = data->client_id;
+    free(data);
+
     struct sockaddr_in sa;
     int socket_fd;
-    int status;
     char buffer[BUFSIZ];
-    int bytes_read;
-    char *msg;
-    int msg_len;
-    int bytes_sent;
 
-    if (ac != 2) {
-        printf("Usage: ./client \"Message to send\"");
-        return (1);
-    }
-
-    // Prepare the address and port for the server socket
     memset(&sa, 0, sizeof sa);
-    sa.sin_family = AF_INET; // IPv4
-    sa.sin_addr.s_addr = htonl(INADDR_LOOPBACK); // 127.0.0.1, localhost
+    sa.sin_family = AF_INET;
     sa.sin_port = htons(PORT);
+    sa.sin_addr.s_addr = inet_addr(server_ip);
 
-    // Create socket, connect it to remote server
     socket_fd = socket(sa.sin_family, SOCK_STREAM, 0);
-    if (socket_fd == -1) {
-        fprintf(stderr, "socket fd error: %s\n", strerror(errno));
-        return (2);
-    }
-    printf("Created socket fd: %d\n", socket_fd);
-
-    status = connect(socket_fd, (struct sockaddr *)&sa, sizeof sa);
-    if (status != 0) {
-        fprintf(stderr, "connect error: %s\n", strerror(errno));
-        return (3);
-    }
-    printf("Connected socket to localhost port %d\n", PORT);
-
-    // Send a message to server
-    msg = av[1];
-    msg_len = strlen(msg);
-    bytes_sent = send(socket_fd, msg, msg_len, 0);
-    if (bytes_sent == -1) {
-        fprintf(stderr, "send error: %s\n", strerror(errno));
-    }
-    else if (bytes_sent == msg_len) {
-        printf("Sent full message: \"%s\"\n", msg);
-    }
-    else {
-        printf("Sent partial message: %d bytes sent.\n", bytes_sent);
+    if (socket_fd == -1)
+    {
+        fprintf(stderr, "[Client %d] socket fd error: %s\n", client_id, strerror(errno));
+        pthread_exit(NULL);
     }
 
-    // Wait for message from server via the socket
-    bytes_read = 1;
-    while (bytes_read >= 0) {
-        bytes_read = recv(socket_fd, buffer, BUFSIZ, 0);
-        if (bytes_read == 0) {
-            printf("Server closed connection.\n");
-            break ;
+    if (connect(socket_fd, (struct sockaddr *)&sa, sizeof sa) != 0)
+    {
+        fprintf(stderr, "[Client %d] connect error: %s\n", client_id, strerror(errno));
+        close(socket_fd);
+        pthread_exit(NULL);
+    }
+
+    printf("[Client %d] Connected to server %s:%d\n", client_id, server_ip, PORT);
+
+    // Generar cantidad aleatoria de mensajes (1 a 3)
+    int num_messages = (rand() % 3) + 1;
+
+    for (int i = 0; i < num_messages; i++)
+    {
+        // Generar texto aleatorio de 8 letras
+        char random_text[9];
+        for (int j = 0; j < 8; j++)
+        {
+            random_text[j] = 'a' + (rand() % 26);
         }
-        else if (bytes_read == -1) {
-            fprintf(stderr, "recv error: %s\n", strerror(errno));
-            break ;
+        random_text[8] = '\0';
+
+        char msg[256];
+        sprintf(msg, "client %d msg %d: %s", client_id, i + 1, random_text);
+        int msg_len = strlen(msg);
+
+        if (send(socket_fd, msg, msg_len, 0) == -1)
+        {
+            fprintf(stderr, "[Client %d] send error\n", client_id);
+            break;
         }
-        else {
-            // We got a message, print it
+
+        int bytes_read = recv(socket_fd, buffer, BUFSIZ - 1, 0);
+        if (bytes_read > 0)
+        {
             buffer[bytes_read] = '\0';
-            printf("Message received: \"%s\"\n", buffer);
-            break ;
+            printf("[Client %d] Response from server: \"%s\"\n", client_id, buffer);
         }
     }
 
-    printf("Closing socket\n");
     close(socket_fd);
-    return (0);
+    printf("[Client %d] Finished and closed socket\n", client_id);
+    return NULL;
+}
+
+int main(void)
+{
+    printf("---- AUTOMATED MULTITHREADED CLIENT ----\n\n");
+    srand(time(NULL)); // Inicializar semilla aleatoria
+
+    printf("Enter server IP address (e.g., 127.0.0.1): ");
+    scanf("%63s", server_ip);
+
+    pthread_t threads[NUM_CLIENTS];
+
+    // Lanzar hilos concurrentes
+    for (int i = 0; i < NUM_CLIENTS; i++)
+    {
+        thread_data_t *data = malloc(sizeof(thread_data_t));
+        data->client_id = i + 1;
+
+        if (pthread_create(&threads[i], NULL, client_thread, data) != 0)
+        {
+            fprintf(stderr, "Failed to create thread %d\n", i + 1);
+        }
+    }
+
+    // Esperar a que todos los hilos terminen
+    for (int i = 0; i < NUM_CLIENTS; i++)
+    {
+        pthread_join(threads[i], NULL);
+    }
+
+    printf("All clients finished.\n");
+    return 0;
 }
