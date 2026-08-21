@@ -62,7 +62,6 @@ def main() -> None:
     else:
         numberOfClients_int = int(numberOfClients)
     serverName, serverPort = serverIdentification()
-    
     threads:list = []
     for _id in range(numberOfClients_int):
         thread:threading.Thread = threading.Thread(target = clientInitialization, args = (_id + 1, serverName, serverPort))
