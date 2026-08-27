@@ -17,10 +17,9 @@ createClientProxy() -> None:
         serverPort:int = DEFAULT_SERVER_PORT
     if serverPort <= MIN_SERVER_PORT_NUMBER or serverPort > MAX_SERVER_PORT_NUMBER:
         serverPort = DEFAULT_SERVER_PORT
-    proxy = xmlrpc.client.ServerProxy(f"http://{serverName}:{serverPort}/RPC2")
-
-result = proxy.add(8, 3) # Call the remote method 'add'
-print("8 + 3 =", result)
+    return proxy = xmlrpc.client.ServerProxy(f"http://{serverName}:{serverPort}/RPC2")
 
 def main() -> None:
     createClientProxy()
+    result = proxy.add(8, 3) # Call the remote method 'add'
+    print("8 + 3 =", result)

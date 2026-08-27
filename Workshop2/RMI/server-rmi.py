@@ -6,8 +6,7 @@ DEFAULT_SERVER_PORT:int = 12000
 MIN_SERVER_PORT_NUMBER:int = 0
 MAX_SERVER_PORT_NUMBER:int = 62235
 
-# Restrict to a particular path.
-class RequestHandler(SimpleXMLRPCRequestHandler):
+class RequestHandler(SimpleXMLRPCRequestHandler): # Restrict to a particular path.
     rpc_paths = ('/RPC2',)
 
 serverName:str = input("Enter server hostname or IP address: ")
