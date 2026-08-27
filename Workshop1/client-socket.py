@@ -39,15 +39,15 @@ def serverIdentification() -> tuple:
 
 def clientInitialization(clientID:int, serverName:str, serverPort:int) -> None:
     numberOfMessages = random.randint(1, 3)
+    clientSocket:socket = socket(AF_INET, SOCK_STREAM)
+    try:
+        clientSocket.connect((serverName, serverPort))
+    except Exception as exception:
+        logging.error(f"Client {clientID} failed: {exception}")
+        break # Break the loop if connection fails.
     for message in range(numberOfMessages):
         randomText = "".join(random.choices(string.ascii_lowercase, k = 8))
         sentence:str = f"Client {clientID}, message {message + 1}: {randomText}"
-        clientSocket:socket = socket(AF_INET, SOCK_STREAM)
-        try:
-            clientSocket.connect((serverName, serverPort))
-        except Exception as exception:
-            logging.error(f"Client {clientID} failed: {exception}")
-            break # Break the loop if connection fails.
         logging.info(f"Client {clientID} successfully connected to the server.")
         clientSocket.send(sentence.encode())
         modifiedSentence:bytes = clientSocket.recv(BYTES_DATA_CHUNK)
@@ -67,9 +67,6 @@ def main() -> None:
         thread:threading.Thread = threading.Thread(target = clientInitialization, args = (_id + 1, serverName, serverPort))
         threads.append(thread)
         thread.start()
-    for thread in threads:
-        thread.join()
-    logging.info("All clients have finished.")
 
 if __name__ == "__main__":
     main()

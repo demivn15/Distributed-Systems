@@ -1,20 +1,25 @@
 import xmlrpc.client
 import numpy as np 
-# Create a client proxy
-serverName = input("Enter server hostname or IP address: ")
-if not serverName:
-    serverName = "localhost"
-try:
-    serverPort = int(input("Enter server port number: "))
-except:
-    print("Invalid input. Using default port 12000.")
-    serverPort = 12000
 
-if serverPort <= 0 or serverPort > 65535:
-    serverPort = 12000
+DEFAULT_SERVER_NAME:str = "localhost"
+DEFAULT_SERVER_PORT:int = 12000
+MIN_SERVER_PORT_NUMBER:int = 0
+MAX_SERVER_PORT_NUMBER:int = 62235
 
-proxy = xmlrpc.client.ServerProxy(f"http://{serverName}:{serverPort}/RPC2")
+createClientProxy() -> None:
+    serverName:str = input("Enter server hostname or IP address: ") # Create a client proxy
+    if not serverName:
+        serverName:str = DEFAULT_SERVER_NAME
+    try:
+        serverPort:int = int(input("Enter server port number: "))
+    except:
+        print(f"Invalid input. Using default port {DEFAULT_SERVER_PORT}.")
+        serverPort:int = DEFAULT_SERVER_PORT
+    if serverPort <= MIN_SERVER_PORT_NUMBER or serverPort > MAX_SERVER_PORT_NUMBER:
+        serverPort = DEFAULT_SERVER_PORT
+    proxy = xmlrpc.client.ServerProxy(f"http://{serverName}:{serverPort}/RPC2")
 
+<<<<<<< HEAD
 matrix1 = np.array([[1, 2], [3, 4]])
 matrix2 = np.array([[5, 6], [7, 8]])
 
@@ -39,3 +44,10 @@ print("Multiplicacion de matrices:")
 print(np.array(multiplicacion_matrix))
 
 
+=======
+result = proxy.add(8, 3) # Call the remote method 'add'
+print("8 + 3 =", result)
+
+def main() -> None:
+    createClientProxy()
+>>>>>>> d25d9742854c2a7028c55a5f3fa6807a38870ba9

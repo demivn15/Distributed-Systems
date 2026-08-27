@@ -11,23 +11,16 @@
 #include <pthread.h>
 #include <time.h>
 #include <arpa/inet.h>
-<<<<<<< HEAD
-#include <netinet/in.h> // Asegura la correcta traducción de puertos
-=======
 #include <netinet/in.h>
->>>>>>> 51b44c8a0fde5747c8a9a23d14f37cbb08c7c48b
-
+#include <netinet/in.h>
 #define PORT 12000
 #define NUM_CLIENTS 3
 
 char server_ip[64];
 
-<<<<<<< HEAD
 typedef struct
 {
-=======
 typedef struct {
->>>>>>> 51b44c8a0fde5747c8a9a23d14f37cbb08c7c48b
     int client_id;
 } thread_data_t;
 
@@ -41,9 +34,7 @@ void *client_thread(void *arg) {
     memset(&sa, 0, sizeof sa);
     sa.sin_family = AF_INET; // IPv4
     sa.sin_port = htons(PORT);
-<<<<<<< HEAD
 
-    // NUEVO: Validación estricta y segura de la IP
     if (inet_pton(AF_INET, server_ip, &sa.sin_addr) <= 0)
     {
         fprintf(stderr, "[Client %d] Invalid IP address format: %s\n", client_id, server_ip);
@@ -54,14 +45,12 @@ void *client_thread(void *arg) {
     socket_fd = socket(sa.sin_family, SOCK_STREAM, 0);
     if (socket_fd == -1)
     {
-=======
     if (inet_pton(AF_INET, server_ip, &sa.sin_addr) <= 0) { // Strict and secure validation of the IP address.
         fprintf(stderr, "[Client %d] Invalid IP address format: %s\n", client_id, server_ip);
         pthread_exit(NULL);
     }
     socket_fd = socket(sa.sin_family, SOCK_STREAM, 0); // Create socket, connect it to remote server.
     if (socket_fd == -1) {
->>>>>>> 51b44c8a0fde5747c8a9a23d14f37cbb08c7c48b
         fprintf(stderr, "[Client %d] socket fd error: %s\n", client_id, strerror(errno));
         pthread_exit(NULL);
     }
@@ -71,15 +60,12 @@ void *client_thread(void *arg) {
         pthread_exit(NULL);
     }
     printf("[Client %d] Connected to server %s:%d\n", client_id, server_ip, PORT);
-<<<<<<< HEAD
 
     int num_messages = (rand() % 3) + 1;
     for (int i = 0; i < num_messages; i++)
     {
-=======
     int num_messages = (rand() % 3) + 1;
     for (int i = 0; i < num_messages; i++) {
->>>>>>> 51b44c8a0fde5747c8a9a23d14f37cbb08c7c48b
         char random_text[9];
         for (int j = 0; j < 8; j++) {
             random_text[j] = 'a' + (rand() % 26);
@@ -88,7 +74,6 @@ void *client_thread(void *arg) {
         char msg[256];
         sprintf(msg, "client %d msg %d: %s", client_id, i + 1, random_text);
         int msg_len = strlen(msg);
-<<<<<<< HEAD
 
         // Send a message to server
         if (send(socket_fd, msg, msg_len, 0) == -1)
@@ -101,14 +86,12 @@ void *client_thread(void *arg) {
         int bytes_read = recv(socket_fd, buffer, BUFSIZ - 1, 0);
         if (bytes_read > 0)
         {
-=======
         if (send(socket_fd, msg, msg_len, 0) == -1) { // Send a message to server.
             fprintf(stderr, "[Client %d] send error\n", client_id);
             break;
         }
         int bytes_read = recv(socket_fd, buffer, BUFSIZ - 1, 0); // Wait for message from server via the socket.
         if (bytes_read > 0) {
->>>>>>> 51b44c8a0fde5747c8a9a23d14f37cbb08c7c48b
             buffer[bytes_read] = '\0';
             printf("[Client %d] Response from server: \"%s\"\n", client_id, buffer);
         }
@@ -121,11 +104,8 @@ void *client_thread(void *arg) {
 int main(void) {
     printf("---- AUTOMATED MULTITHREADED CLIENT ----\n\n");
     srand(time(NULL));
-<<<<<<< HEAD
 
     printf("Enter server IP address (e.g., 127.0.0.1): ");
-
-    // NUEVO: Limpiamos cualquier salto de línea o espacio basura que Cygwin pueda meter
     if (fgets(server_ip, sizeof(server_ip), stdin) != NULL)
     {
         server_ip[strcspn(server_ip, "\r\n ")] = '\0';
@@ -135,27 +115,21 @@ int main(void) {
 
     for (int i = 0; i < NUM_CLIENTS; i++)
     {
-=======
     printf("Enter server IP address (e.g., 127.0.0.1): ");
     if (fgets(server_ip, sizeof(server_ip), stdin) != NULL) { // Cleaning Cywing output.
         server_ip[strcspn(server_ip, "\r\n ")] = '\0';
     }
     pthread_t threads[NUM_CLIENTS];
     for (int i = 0; i < NUM_CLIENTS; i++) {
->>>>>>> 51b44c8a0fde5747c8a9a23d14f37cbb08c7c48b
         thread_data_t *data = malloc(sizeof(thread_data_t));
         data->client_id = i + 1;
         if (pthread_create(&threads[i], NULL, client_thread, data) != 0) {
             fprintf(stderr, "Failed to create thread %d\n", i + 1);
         }
     }
-<<<<<<< HEAD
-
     for (int i = 0; i < NUM_CLIENTS; i++)
     {
-=======
     for (int i = 0; i < NUM_CLIENTS; i++) {
->>>>>>> 51b44c8a0fde5747c8a9a23d14f37cbb08c7c48b
         pthread_join(threads[i], NULL);
     }
     printf("All clients finished.\n");
