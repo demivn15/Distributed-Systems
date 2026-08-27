@@ -1,34 +1,34 @@
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 
+DEFAULT_SERVER_NAME:str = "localhost"
+DEFAULT_SERVER_PORT:int = 12000
+MIN_SERVER_PORT_NUMBER:int = 0
+MAX_SERVER_PORT_NUMBER:int = 62235
+
 # Restrict to a particular path.
 class RequestHandler(SimpleXMLRPCRequestHandler):
     rpc_paths = ('/RPC2',)
 
-serverName = input("Enter server hostname or IP address: ")
+serverName:str = input("Enter server hostname or IP address: ")
 if not serverName:
-    serverName = "localhost"
+    serverName:str = DEFAULT_SERVER_NAME
 try:
-    serverPort = int(input("Enter server port number: "))
+    serverPort:int = int(input("Enter server port number: "))
 except:
-    print("Invalid input. Using default port 12000.")
-    serverPort = 12000
+    print(f"Invalid input. Using default port {DEFAULT_SERVER_PORT}.")
+    serverPort:int = DEFAULT_SERVER_PORT
 
-if serverPort <= 0 or serverPort > 65535:
-    serverPort = 12000
+if serverPort <= MIN_SERVER_PORT_NUMBER or serverPort > MAX_SERVER_PORT_NUMBER:
+    serverPort = DEFAULT_SERVER_PORT
 
-# Create server
-with SimpleXMLRPCServer((serverName, serverPort),
-                         requestHandler=RequestHandler) as server:
+with SimpleXMLRPCServer((serverName, serverPort), requestHandler=RequestHandler) as server: # Create server
     server.register_introspection_functions()
-
-    # Register a function under a different name
-    def add(x, y):
+    def add(x, y): # Register a function under a different name
         return x + y
 
     server.register_function(add, 'add')
 
-    # Run the server's main loop
-    print(f"Server is listening on {serverName}:{serverPort}...")
+    print(f"Server is listening on {serverName}:{serverPort}...") # Run the server's main loop
     server.serve_forever()
 
