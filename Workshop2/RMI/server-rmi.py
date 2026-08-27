@@ -18,7 +18,6 @@ def serverIdentification() -> tuple:
     except:
         print(f"Invalid input. Using default port {DEFAULT_SERVER_PORT}.")
         serverPort:int = DEFAULT_SERVER_PORT
-
     if serverPort <= MIN_SERVER_PORT_NUMBER or serverPort > MAX_SERVER_PORT_NUMBER:
         serverPort = DEFAULT_SERVER_PORT
     return serverName, serverPort
@@ -54,3 +53,6 @@ def serverCreation(serverName:str, serverPort:int):
 def main() -> None:
     serverName:str, serverPort:int = serverIdentification()
     serverCreation(serverName, serverPort)
+
+if __name__ == "__main__":
+    main()

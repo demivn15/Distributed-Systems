@@ -18,7 +18,7 @@ def createClientProxy() -> xmlrpc.client.ServerProxy:
     if serverPort <= MIN_SERVER_PORT_NUMBER or serverPort > MAX_SERVER_PORT_NUMBER:
         serverPort = DEFAULT_SERVER_PORT
     proxy = xmlrpc.client.ServerProxy(f"http://{serverName}:{serverPort}/RPC2")
-    return proxy 
+    return proxy
 
 def matrixInitialization() -> tuple:
     matrix1 = np.array([[1, 2], [3, 4]])
