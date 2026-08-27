@@ -5,17 +5,20 @@ import time
 import threading
 
 def handle_client(connectionSocket, addr):
-    print(f"From Client: {addr}")
-    try:
-        sentence = connectionSocket.recv(1024).decode()
-        print(f"I received from {addr}: {sentence}")
-        capitalizedSentence = sentence.upper()
-        time.sleep(3)
-        connectionSocket.send(capitalizedSentence.encode())
-    except Exception as e:
-        print("Error with client", addr, ":", e)
-    finally:
-        connectionSocket.close()
+    while True:
+        print(f"From Client: {addr}")
+        try:
+            sentence = connectionSocket.recv(1024).decode()
+            print(f"I received from {addr}: {sentence}")
+            capitalizedSentence = sentence.upper()
+            time.sleep(3)
+            connectionSocket.send(capitalizedSentence.encode())
+        except Exception as e:
+            print("Error with client", addr, ":", e)
+        finally:
+            connectionSocket.close()
+            break
+
 try:
     serverPort = int(input("Enter server port number: "))
 except:
