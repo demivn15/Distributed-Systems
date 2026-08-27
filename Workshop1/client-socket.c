@@ -10,13 +10,13 @@
 #include <pthread.h>
 #include <time.h>
 #include <arpa/inet.h>
+#include <netinet/in.h> // Asegura la correcta traducción de puertos
 
 #define PORT 12000
 #define NUM_CLIENTS 3
 
 char server_ip[64];
 
-// Estructura para pasar datos al hilo
 typedef struct
 {
     int client_id;
@@ -33,10 +33,17 @@ void *client_thread(void *arg)
     char buffer[BUFSIZ];
 
     memset(&sa, 0, sizeof sa);
-    sa.sin_family = AF_INET;
+    sa.sin_family = AF_INET; // IPv4
     sa.sin_port = htons(PORT);
-    sa.sin_addr.s_addr = inet_addr(server_ip);
 
+    // NUEVO: Validación estricta y segura de la IP
+    if (inet_pton(AF_INET, server_ip, &sa.sin_addr) <= 0)
+    {
+        fprintf(stderr, "[Client %d] Invalid IP address format: %s\n", client_id, server_ip);
+        pthread_exit(NULL);
+    }
+
+    // Create socket, connect it to remote server
     socket_fd = socket(sa.sin_family, SOCK_STREAM, 0);
     if (socket_fd == -1)
     {
@@ -53,12 +60,9 @@ void *client_thread(void *arg)
 
     printf("[Client %d] Connected to server %s:%d\n", client_id, server_ip, PORT);
 
-    // Generar cantidad aleatoria de mensajes (1 a 3)
     int num_messages = (rand() % 3) + 1;
-
     for (int i = 0; i < num_messages; i++)
     {
-        // Generar texto aleatorio de 8 letras
         char random_text[9];
         for (int j = 0; j < 8; j++)
         {
@@ -70,12 +74,14 @@ void *client_thread(void *arg)
         sprintf(msg, "client %d msg %d: %s", client_id, i + 1, random_text);
         int msg_len = strlen(msg);
 
+        // Send a message to server
         if (send(socket_fd, msg, msg_len, 0) == -1)
         {
             fprintf(stderr, "[Client %d] send error\n", client_id);
             break;
         }
 
+        // Wait for message from server via the socket
         int bytes_read = recv(socket_fd, buffer, BUFSIZ - 1, 0);
         if (bytes_read > 0)
         {
@@ -92,14 +98,18 @@ void *client_thread(void *arg)
 int main(void)
 {
     printf("---- AUTOMATED MULTITHREADED CLIENT ----\n\n");
-    srand(time(NULL)); // Inicializar semilla aleatoria
+    srand(time(NULL));
 
     printf("Enter server IP address (e.g., 127.0.0.1): ");
-    scanf("%63s", server_ip);
+
+    // NUEVO: Limpiamos cualquier salto de línea o espacio basura que Cygwin pueda meter
+    if (fgets(server_ip, sizeof(server_ip), stdin) != NULL)
+    {
+        server_ip[strcspn(server_ip, "\r\n ")] = '\0';
+    }
 
     pthread_t threads[NUM_CLIENTS];
 
-    // Lanzar hilos concurrentes
     for (int i = 0; i < NUM_CLIENTS; i++)
     {
         thread_data_t *data = malloc(sizeof(thread_data_t));
@@ -111,7 +121,6 @@ int main(void)
         }
     }
 
-    // Esperar a que todos los hilos terminen
     for (int i = 0; i < NUM_CLIENTS; i++)
     {
         pthread_join(threads[i], NULL);
