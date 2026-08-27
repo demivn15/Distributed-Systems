@@ -24,14 +24,9 @@ if serverPort <= MIN_SERVER_PORT_NUMBER or serverPort > MAX_SERVER_PORT_NUMBER:
 
 with SimpleXMLRPCServer((serverName, serverPort), requestHandler=RequestHandler) as server: # Create server
     server.register_introspection_functions()
-<<<<<<< HEAD
 
     # Register a function under a different name
     def add(matrix1_list, matrix2_list):
-=======
-    def add(x, y): # Register a function under a different name
-        return x + y
->>>>>>> d25d9742854c2a7028c55a5f3fa6807a38870ba9
 
         np_matrix1 = np.array(matrix1_list)
         np_matrix2 = np.array(matrix2_list)
@@ -47,7 +42,7 @@ with SimpleXMLRPCServer((serverName, serverPort), requestHandler=RequestHandler)
         np_matrix2 = np.array(matrix2_list)
         if np_matrix1.shape[1] != np_matrix2.shape[0]:
             raise ValueError("Number of columns in the first matrix must be equal to the number of rows in the second matrix for multiplication.")
-        return np.dot(matrix1_list, matrix2_list).tolist()
+        return np.dot(np_matrix1, np_matrix2).tolist()
 
     
     server.register_function(add, 'add')

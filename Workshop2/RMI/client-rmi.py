@@ -1,7 +1,7 @@
 import xmlrpc.client
 import numpy as np 
 
-DEFAULT_SERVER_NAME:str = "172.23.205.233"
+DEFAULT_SERVER_NAME:str = "localhost"
 DEFAULT_SERVER_PORT:int = 12000
 MIN_SERVER_PORT_NUMBER:int = 0
 MAX_SERVER_PORT_NUMBER:int = 62235
