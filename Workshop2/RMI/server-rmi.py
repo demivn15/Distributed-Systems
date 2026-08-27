@@ -24,15 +24,9 @@ if serverPort <= MIN_SERVER_PORT_NUMBER or serverPort > MAX_SERVER_PORT_NUMBER:
 
 with SimpleXMLRPCServer((serverName, serverPort), requestHandler=RequestHandler) as server: # Create server
     server.register_introspection_functions()
-<<<<<<< HEAD
 
     # Register a function under a different name
     def add(matrix1_list, matrix2_list):
-=======
-    def add(x, y): # Register a function under a different name
-        return x + y
->>>>>>> d25d9742854c2a7028c55a5f3fa6807a38870ba9
-
         np_matrix1 = np.array(matrix1_list)
         np_matrix2 = np.array(matrix2_list)
         return np.add(np_matrix1, np_matrix2).tolist()
@@ -56,4 +50,3 @@ with SimpleXMLRPCServer((serverName, serverPort), requestHandler=RequestHandler)
 
     print(f"Server is listening on {serverName}:{serverPort}...") # Run the server's main loop
     server.serve_forever()
-

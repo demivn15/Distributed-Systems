@@ -6,7 +6,7 @@ DEFAULT_SERVER_PORT:int = 12000
 MIN_SERVER_PORT_NUMBER:int = 0
 MAX_SERVER_PORT_NUMBER:int = 62235
 
-createClientProxy() -> None:
+def createClientProxy() -> None:
     serverName:str = input("Enter server hostname or IP address: ") # Create a client proxy
     if not serverName:
         serverName:str = DEFAULT_SERVER_NAME
@@ -25,11 +25,11 @@ def matrixInitialization() -> tuple:
     matrix2 = np.array([[5, 6], [7, 8]])
     matrix1_list = matrix1.tolist()
     matrix2_list = matrix2.tolist()
-    return matrix1_list, matrix2_list
+    return matrix1st, matrix2_list
 
 def main() -> None:
     proxy = createClientProxy()
-    matrix1_lsit, matrix2_list = matrixInitialization()
+    matrix1_list, matrix2_list = matrixInitialization()
     suma_matrix = proxy.add(matrix1_list, matrix2_list) #Call the remote method 'add, substract, multiply' matrix
     resta_matrix = proxy.subtract(matrix1_list, matrix2_list)
     multiplicacion_matrix = proxy.multiply(matrix1_list, matrix2_list)
@@ -44,5 +44,5 @@ def main() -> None:
     print("Multiplicacion de matrices:")
     print(np.array(multiplicacion_matrix))
 
-if __name__ = "__main__":
+if __name__ == "__main__":
     main()
