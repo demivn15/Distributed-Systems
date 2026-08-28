@@ -2,7 +2,7 @@ from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 import numpy as np 
 
-DEFAULT_SERVER_NAME:str = "localhost"
+DEFAULT_SERVER_NAME:str = "0.0.0.0"
 DEFAULT_SERVER_PORT:int = 12000
 MIN_SERVER_PORT_NUMBER:int = 0
 MAX_SERVER_PORT_NUMBER:int = 62235
@@ -51,7 +51,7 @@ def serverCreation(serverName:str, serverPort:int):
         server.serve_forever()
 
 def main() -> None:
-    serverName:str, serverPort:int = serverIdentification()
+    serverName, serverPort = serverIdentification()
     serverCreation(serverName, serverPort)
 
 if __name__ == "__main__":
