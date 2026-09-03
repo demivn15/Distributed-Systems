@@ -6,7 +6,7 @@ r = context.socket(zmq.PULL)
 me = str(sys.argv[1]) if len(sys.argv) > 1 else "Unknown Worker"
 
 
-serverName = "localhost"
+serverName = "172.23.197.246"
 #Change to the Broker's OUTPUT port 
 serverPort = 13001
 
