@@ -1,6 +1,6 @@
-# Distributed-Systems
+# 🌐 Distributed-Systems
 
-## Workshop 1
+## Workshop 1: Client/Server
 
 ### Environment setup
 
@@ -24,8 +24,13 @@ Results show proper communication between parties regardless of the language use
 
 It is important to notice that, in order to properly connect both systems, Windows had to be configured at the firewall level to allow inbound TCP traffic from port 12000.
 
----
-
 > For more details check the full report.
 
 ---
+
+## Workshop 2: Communication (Messaging and Message Queuing)
+
+---
+
+## Workshop 3: Naming
+
