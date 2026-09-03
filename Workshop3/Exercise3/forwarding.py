@@ -18,13 +18,13 @@ def main():
     address, hops = resolve("A")
     print("Final address:", address)
     print("Number of hops:", hops)
-
+    print()
     print("--- AFTER OPTIMIZATION ---")
     locations["A"] = address
     address_opt, hops_opt = resolve("A")
     print("Final address:", address_opt)
     print("Number of hops:", hops_opt)
-
+    print()
     print("\n--- FAILURE SILUMATION ---")
     locations["A"] = "B" 
     del locations["C"]
