@@ -1,4 +1,4 @@
-# 🌐 Distributed-Systems
+# 🌐 Distributed Systems
 
 ## Workshop 1: Client/Server
 
