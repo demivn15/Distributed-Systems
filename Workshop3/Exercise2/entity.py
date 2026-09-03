@@ -1,6 +1,6 @@
 import socket
 
-ENTITY_ID = "Demian"
+ENTITY_ID = "Demian-Student"
 PORT = 50000
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -9,15 +9,13 @@ sock.bind(("", PORT))
 
 print("Entity waiting for location requests...")
 
-while True:
-    data, addr = sock.recvfrom(1024)
-    message = data.decode()
-if message == ENTITY_ID:
-    response = f"{ENTITY_ID}:{socket.gethostbyname(socket.gethostname())}"
-    sock.sendto(response.encode(), addr)
-
 def main():
-    pass
+    while True:
+        data, addr = sock.recvfrom(1024)
+        message = data.decode()
+        if message == ENTITY_ID:
+            response = f"{ENTITY_ID}:{socket.gethostbyname(socket.gethostname())}"
+            sock.sendto(response.encode(), addr)
 
 if __name__ == "__main__":
     main()
