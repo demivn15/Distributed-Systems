@@ -1,0 +1,6 @@
+dn: uid=user1234,ou=People,dc=alejandroydemian,dc=com
+objectClass: inetOrgPerson
+uid: User
+sn: Guest
+cn: User Guest
+userPassword: password123
