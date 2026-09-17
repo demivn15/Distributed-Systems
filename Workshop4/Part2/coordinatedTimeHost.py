@@ -7,15 +7,10 @@ import random
 MY_IP = "172.23.207.8"
 MY_PORT = 5003
 # Configuración de los puertos para simular nodos en la misma máquina
-<<<<<<< HEAD:Workshop4/Part2/coordinatedTime.py
-HOST = '172.23.207.180'
-OTHER_PEERS = [(HOST,5001), (HOST,5002)]  # Puertos de los otros nodos
-=======
 PORTS = [5001, 5002]
 HOST = '127.0.0.1'
 HOST_EXTERNAL = "172.23.207.8"
 PORT_EXTERNAL = 5003
->>>>>>> cc1b0b6844a3902558520558b7ae5341a55dc733:Workshop4/Part2/coordinatedTimeHost.py
 
 def peer_listener(port, shared_time):
     """Hilo en segundo plano que escucha peticiones de tiempo de otros nodos."""
@@ -78,13 +73,11 @@ def peer_process(peer_id, port, other_ports):
             ciclos_actuales = 0 # Reiniciar contador de ciclos
 
 if __name__ == '__main__':
-<<<<<<< HEAD:Workshop4/Part2/coordinatedTime.py
-=======
     procesos = []
     
     # Crear y lanzar un proceso independiente por cada puerto/nodo
     for i, port in enumerate(PORTS):
-        other_local_ports = [p for p in PORTS if p != port][0]
+        other_local_pnightcallorts = [p for p in PORTS if p != port][0]
         other_nodes = [
             (HOST, other_local_ports),
             (HOST_EXTERNAL, PORT_EXTERNAL)
@@ -92,7 +85,6 @@ if __name__ == '__main__':
         p = multiprocessing.Process(target=peer_process, args=(i+1, port, other_nodes))
         procesos.append(p)
         p.start()
->>>>>>> cc1b0b6844a3902558520558b7ae5341a55dc733:Workshop4/Part2/coordinatedTimeHost.py
 
     p= multiprocessing.Process(target=peer_process, args=("3", MY_PORT, OTHER_PEERS))
     p.start()
