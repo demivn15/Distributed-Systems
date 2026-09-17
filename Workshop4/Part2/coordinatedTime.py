@@ -4,14 +4,16 @@ import threading
 import time
 import random
 
+MY_IP = "172.23.207.8"
+MY_PORT = 5003
 # Configuración de los puertos para simular nodos en la misma máquina
-PORTS = [5001, 5002, 5003]
-HOST = '127.0.0.1'
+HOST = '172.23.207.180'
+OTHER_PEERS = [(HOST,5001), (HOST,5002)]  # Puertos de los otros nodos
 
 def peer_listener(port, shared_time):
     """Hilo en segundo plano que escucha peticiones de tiempo de otros nodos."""
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.bind((HOST, port))
+    sock.bind((MY_IP, port))
     
     while True:
         data, addr = sock.recvfrom(1024)
@@ -49,9 +51,9 @@ def peer_process(peer_id, port, other_ports):
             # 2. Solicitar tiempo a los demás nodos (Peers)
             collected_times = [shared_time['clock']] # Incluye su propio tiempo
             
-            for p in other_ports:
+            for ip, p in other_ports:
                 try:
-                    sock.sendto(b"REQ_TIME", (HOST, p))
+                    sock.sendto(b"REQ_TIME", (ip, p))
                     data, _ = sock.recvfrom(1024)
                     collected_times.append(float(data.decode()))
                 except socket.timeout:
@@ -69,20 +71,11 @@ def peer_process(peer_id, port, other_ports):
             ciclos_actuales = 0 # Reiniciar contador de ciclos
 
 if __name__ == '__main__':
-    procesos = []
-    
-    # Crear y lanzar un proceso independiente por cada puerto/nodo
-    for i, port in enumerate(PORTS):
-        other_ports = [p for p in PORTS if p != port]
-        p = multiprocessing.Process(target=peer_process, args=(i+1, port, other_ports))
-        procesos.append(p)
-        p.start()
 
+    p= multiprocessing.Process(target=peer_process, args=("3", MY_PORT, OTHER_PEERS))
+    p.start()
     try:
-        # Mantener el programa principal en ejecución
-        for p in procesos:
             p.join()
     except KeyboardInterrupt:
         print("\nDeteniendo todos los procesos...")
-        for p in procesos:
-            p.terminate()
+        p.terminate()
