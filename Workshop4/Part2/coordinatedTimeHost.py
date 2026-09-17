@@ -5,8 +5,10 @@ import time
 import random
 
 # Configuración de los puertos para simular nodos en la misma máquina
-PORTS = [5001, 5002, 5003]
+PORTS = [5001, 5002]
 HOST = '127.0.0.1'
+HOST_EXTERNAL = "172.23.207.8"
+PORT_EXTERNAL = 5003
 
 def peer_listener(port, shared_time):
     """Hilo en segundo plano que escucha peticiones de tiempo de otros nodos."""
@@ -49,9 +51,9 @@ def peer_process(peer_id, port, other_ports):
             # 2. Solicitar tiempo a los demás nodos (Peers)
             collected_times = [shared_time['clock']] # Incluye su propio tiempo
             
-            for p in other_ports:
+            for ip, p in other_ports:
                 try:
-                    sock.sendto(b"REQ_TIME", (HOST, p))
+                    sock.sendto(b"REQ_TIME", (ip, p))
                     data, _ = sock.recvfrom(1024)
                     collected_times.append(float(data.decode()))
                 except socket.timeout:
@@ -73,8 +75,12 @@ if __name__ == '__main__':
     
     # Crear y lanzar un proceso independiente por cada puerto/nodo
     for i, port in enumerate(PORTS):
-        other_ports = [p for p in PORTS if p != port]
-        p = multiprocessing.Process(target=peer_process, args=(i+1, port, other_ports))
+        other_local_ports = [p for p in PORTS if p != port][0]
+        other_nodes = [
+            (HOST, other_local_ports),
+            (HOST_EXTERNAL, PORT_EXTERNAL)
+        ]
+        p = multiprocessing.Process(target=peer_process, args=(i+1, port, other_nodes))
         procesos.append(p)
         p.start()
 
