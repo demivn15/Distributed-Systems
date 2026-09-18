@@ -4,7 +4,7 @@ import sys
 import random
 
 # Change SERVER_IP to the actual IP of the machine running centralServer.py
-SERVER_IP = "127.0.0.1"
+SERVER_IP = "127.23.207.8"
 SERVER_PORT = 6000
 
 def run_client(client_id):

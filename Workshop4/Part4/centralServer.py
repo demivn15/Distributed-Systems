@@ -1,12 +1,13 @@
 import zmq
 import time
 
+SERVER_IP = "172.23.207.180"
 SERVER_PORT = 6000
 
 def run_central_server():
     context = zmq.Context()
     sock = context.socket(zmq.REP)
-    sock.bind(f"tcp://*:{SERVER_PORT}")
+    sock.bind(f"tcp://{SERVER_IP}:{SERVER_PORT}")
     
     print(f"[Central Server] Running on port {SERVER_PORT}...")
     current_holder = None
