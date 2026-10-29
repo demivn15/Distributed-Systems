@@ -1,13 +1,12 @@
-
 /* c_consumer.c */
-#include <amqp.h>
-#include <amqp_tcp_socket.h>
-#include <amqp_framing.h>
+#include <rabbitmq-c/amqp.h>
+#include <rabbitmq-c/amqp_tcp_socket.h>
+#include <rabbitmq-c/amqp_framing.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
-  const char *hostname = "localhost";
+  const char *hostname = "172.23.204.81";
   int port = 5672;
   const char *queue = "hello";
 
