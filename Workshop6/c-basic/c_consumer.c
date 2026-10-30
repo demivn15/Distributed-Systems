@@ -1,49 +1,66 @@
 /* c_consumer.c */
 #include <rabbitmq-c/amqp.h>
-#include <rabbitmq-c/amqp_tcp_socket.h>
-#include <rabbitmq-c/amqp_framing.h>
+#include <rabbitmq-c/tcp_socket.h>
+#include <rabbitmq-c/framing.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
-  const char *hostname = "172.23.204.81";
-  int port = 5672;
-  const char *queue = "hello";
+    const char *hostname = "172.23.204.81";
+    int port = 5672;
+    const char *queue = "hello";
 
-  amqp_connection_state_t conn = amqp_new_connection();
-  amqp_socket_t *socket = amqp_tcp_socket_new(conn);
-  if (!socket) { fprintf(stderr, "Socket error\n"); return 1; }
-  if (amqp_socket_open(socket, hostname, port)) { fprintf(stderr, "Open socket error\n"); return 1; }
+    amqp_connection_state_t conn = amqp_new_connection();
+    amqp_socket_t *socket = amqp_tcp_socket_new(conn);
+    if (!socket) { 
+        fprintf(stderr, "Socket error\n"); 
+        return 1; 
+    }
+    
+    if (amqp_socket_open(socket, hostname, port)) { 
+        fprintf(stderr, "Open socket error\n"); 
+        return 1; 
+    }
 
-  amqp_login(conn, "/", 0, 131072, 0, AMQP_SASL_METHOD_PLAIN, "guest", "guest");
-  amqp_channel_open(conn, 1);
-  amqp_get_rpc_reply(conn);
+    amqp_rpc_reply_t login_reply = amqp_login(conn, "/", 0, 131072, 0, AMQP_SASL_METHOD_PLAIN, "student", "student123");
+    if (login_reply.reply_type != AMQP_RESPONSE_NORMAL) {
+        fprintf(stderr, "Login failed. Check credentials or vhost.\n");
+        return 1;
+    }
 
-  amqp_queue_declare_ok_t *r = amqp_queue_declare(conn, 1, amqp_cstring_bytes(queue),
-      1, 0, 0, 0, amqp_empty_table);
-  (void)r; // assume success for brevity
+    amqp_channel_open(conn, 1);
+    amqp_get_rpc_reply(conn);
 
-  amqp_basic_consume(conn, 1, amqp_cstring_bytes(queue), amqp_empty_bytes, 0, 0, 0, amqp_empty_table);
+    amqp_queue_declare(conn, 1, amqp_cstring_bytes(queue), 0, 0, 0, 0, amqp_empty_table);
+    amqp_get_rpc_reply(conn);
 
-  printf(" [*] Waiting for messages. Ctrl+C to exit.\n");
-  while (1) {
-    amqp_rpc_reply_t res;
-    amqp_envelope_t envelope;
+    amqp_basic_consume(conn, 1, amqp_cstring_bytes(queue), amqp_empty_bytes, 0, 0, 0, amqp_empty_table);
+    amqp_get_rpc_reply(conn);
 
-    amqp_maybe_release_buffers(conn);
-    res = amqp_consume_message(conn, &envelope, NULL, 0);
-    if (AMQP_RESPONSE_NORMAL != res.reply_type) break;
+    printf(" [*] Waiting for messages. Ctrl+C to exit.\n");
+    
+    while (1) {
+        amqp_rpc_reply_t res;
+        amqp_envelope_t envelope;
 
-    printf(" [x] Received: %.*s\n",
-           (int)envelope.message.body.len,
-           (char *)envelope.message.body.bytes);
+        amqp_maybe_release_buffers(conn);
+        res = amqp_consume_message(conn, &envelope, NULL, 0);
+        
+        if (AMQP_RESPONSE_NORMAL != res.reply_type) {
+            fprintf(stderr, "Connection closed or error encountered (reply_type: %d).\n", res.reply_type);
+            break;
+        }
 
-    amqp_basic_ack(conn, 1, envelope.delivery_tag, 0);
-    amqp_destroy_envelope(&envelope);
-  }
+        printf(" [x] Received: %.*s\n",
+               (int)envelope.message.body.len,
+               (char *)envelope.message.body.bytes);
 
-  amqp_channel_close(conn, 1, AMQP_REPLY_SUCCESS);
-  amqp_connection_close(conn, AMQP_REPLY_SUCCESS);
-  amqp_destroy_connection(conn);
-  return 0;
+        amqp_basic_ack(conn, 1, envelope.delivery_tag, 0);
+        amqp_destroy_envelope(&envelope);
+    }
+
+    amqp_channel_close(conn, 1, AMQP_REPLY_SUCCESS);
+    amqp_connection_close(conn, AMQP_REPLY_SUCCESS);
+    amqp_destroy_connection(conn);
+    return 0;
 }
