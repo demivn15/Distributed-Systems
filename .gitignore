@@ -2,3 +2,4 @@ Workshop*/.venv/
 Workshop*/*.pdf
 Workshop1/client-socket
 Workshop1/server-socket
+__pycache__
