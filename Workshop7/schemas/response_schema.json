@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FL_Metrics_Response",
+  "type": "object",
+  "properties": {
+    "request_id": { "type": "string" },
+    "node_id": { "type": "string" },
+    "status": { "type": "string", "enum": ["SUCCESS", "FAILED"] },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "loss": { "type": "number" },
+        "accuracy": { "type": "number", "minimum": 0, "maximum": 1.0 },
+        "samples_processed": { "type": "integer", "minimum": 1 },
+        "training_time_seconds": { "type": "number" }
+      },
+      "required": ["loss", "accuracy", "samples_processed", "training_time_seconds"]
+    },
+    "timestamp": { "type": "string" }
+  },
+  "required": ["request_id", "node_id", "status", "metrics", "timestamp"]
+}
