@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FL_Training_Request",
+  "type": "object",
+  "properties": {
+    "request_id": { "type": "string" },
+    "global_round": { "type": "integer", "minimum": 1 },
+    "hyperparameters": {
+      "type": "object",
+      "properties": {
+        "learning_rate": { "type": "number", "exclusiveMinimum": 0 },
+        "batch_size": { "type": "integer", "minimum": 1 },
+        "epochs": { "type": "integer", "minimum": 1 }
+      },
+      "required": ["learning_rate", "batch_size", "epochs"]
+    }
+  },
+  "required": ["request_id", "global_round", "hyperparameters"]
+}
