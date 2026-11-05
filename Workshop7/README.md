@@ -1,6 +1,6 @@
 # Workshop 7: Data-interchange using JSON (Secure FL System)
 
-Distributed Systems, Yachay Tech. Master (server) and Node (client) exchange JSON over
+Master (server) and Node (client) exchange JSON over
 hybrid RSA-2048 + AES-256-GCM with RSA-PSS signatures. Two activities are measured:
 Activity 1 (JSON Schema validated) and Activity 2 (no schema).
 
@@ -42,7 +42,7 @@ Then distribute them. Private keys never leave their machine:
    python -m benchmarks.benchmark_activity2 --master http://<MASTER_IP>:5000 --runs 30
    ```
 
-Raw per-run data is written to `benchmarks/results/*.csv`. Use it for the report.
+Raw per-run data is written to `benchmarks/results/*.csv`.
 
 ## What is measured
 
@@ -70,4 +70,4 @@ All timings come from the Node's clock. Nothing compares clocks between the two 
   not part of this workshop.
 - **Table 5.2 of the spec** contains example numbers, not measured results. Do not copy them into the report.
 - **Activity 2 is "without a predefined schema"**, which we interpret as: the Master accepts any
-  JSON payload and performs no validation. Confirm the interpretation with the professor.
+  JSON payload and performs no validation.
